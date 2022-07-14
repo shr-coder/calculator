@@ -1,0 +1,97 @@
+package com.example.parsing;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+
+import org.json.JSONObject;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.InputStream;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+public class MainActivity extends AppCompatActivity {
+    public static final String JSON_STRING = "{" +
+            "\"student\":{\"name\":\"GSSSIETW\",\"city\":\"Mysuru\",\"humidity\":\"20\",\"temp\":\"32\"}" +
+            "}";
+    TextView tv1, tv2;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        tv1 = (TextView) findViewById(R.id.dXML);
+        tv2 = (TextView) findViewById(R.id.dJSON);
+    }
+
+    public void xmlread(View view) {
+        try {
+            InputStream is = getAssets().open("city.xml");
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(is);
+            Element element = doc.getDocumentElement();
+            element.normalize();
+            NodeList nList = doc.getElementsByTagName("staff");
+            for (int i = 0; i < nList.getLength(); i++) {
+                Node node = nList.item(i);
+                if (node.getNodeType() == Node.ELEMENT_NODE) {
+                    Element element2 = (Element) node;
+                    tv1.setText(tv1.getText() + "\nName : " + getValue("name", element2));
+                    tv1.setText(tv1.getText() + "\nCity : " + getValue("city", element2));
+                    tv1.setText(tv1.getText() + "\nHumidity : " + getValue("humidity", element2));
+                    tv1.setText(tv1.getText() + "\ntemp: " +getValue("temp",element2));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String getValue(String tag, Element element) {
+        NodeList nodeList = element.getElementsByTagName(tag).item(0).getChildNodes();
+        Node node = nodeList.item(0);
+        return node.getNodeValue();
+    }
+
+    public void readJson(View view) {
+        try {
+            JSONObject emp = (new JSONObject(JSON_STRING)).getJSONObject("student");
+            String empname=emp.getString("name");
+            String city=emp.getString("city");
+            String humidity=emp.getString("humidity");
+            String temp=emp.getString("temp");
+
+
+            String str="Name:"+empname+"\n"+"City:"+city+"\n"+"humidity:"+humidity+"\n"+"temp:"+temp;
+            tv2.setText(str);
+
+        }catch (Exception e) {e.printStackTrace();}
+    }
+
+}
+
+
+
+
+
+<?xml version="1.0"?>
+<student>
+    <name>GSSIETW</name>
+    <city>Mysuru</city>
+    <humidity>10</humidity>
+    <temp>32</temp>
+    <staff>
+        <name>GSSIETW</name>
+        <city>Mysuru</city>
+        <humidity>20</humidity>
+        <temp>32</temp>
+    </staff>
+</student>
